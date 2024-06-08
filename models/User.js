@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   isLeader: { type: Boolean, default: false },
   phoneNumber: { type: String, required: false },
+  headShot: { type: String, required: false },
 });
 
 module.exports = mongoose.model('User', userSchema);

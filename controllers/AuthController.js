@@ -95,6 +95,7 @@ class AuthController {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
+          headShot: user.headShot,
         },
       });
     } catch (err) {
