@@ -92,6 +92,9 @@ class AuthController {
           username: user.username,
           isLeader: user.isLeader,
           phoneNumber: user.phoneNumber,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
         },
       });
     } catch (err) {
