@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 class LeadershipController {
   async getAll(req, res) {
-    const leadership = await Leadership.find().populate('user', 'username');
+    const leadership = await Leadership.find().populate('user', 'username email phoneNumber firstName lastName');
     res.json(leadership);
   }
 
