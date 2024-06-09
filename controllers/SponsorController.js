@@ -12,6 +12,11 @@ class SponsorController {
 
   async create(req, res) {
     try {
+      const existingSponsor = await Sponsor.findOne({ name: req.body.name });
+      if (existingSponsor) {
+        return res.status(400).json({ message: 'Sponsor already exists' });
+      }
+
       const sponsor = new Sponsor(req.body);
       await sponsor.save();
       res.json(sponsor);

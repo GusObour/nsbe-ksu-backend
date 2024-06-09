@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const validator = require('validator');
 const User = require('../models/User');
+const { AvatarGenerator } = require('random-avatar-generator');
+const SMSService = require('../services/smsService');
 
 class AuthController {
   async register(req, res) {
@@ -11,29 +13,38 @@ class AuthController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { firstName, lastName, email, username, password, isLeader, phoneNumber } = req.body;
+    const { firstName, lastName, email, username, password, isLeader, phoneNumber, agreeToSMS } = req.body;
 
     if (!validator.isEmail(email)) {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
-    if (!validator.isStrongPassword(password)) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters long contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character' });
+    if (!validator.isStrongPassword(password, { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+      return res.status(400).json({
+        message: 'Password must be at least 6 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character'
+      });
     }
 
-    if(!validator.isMobilePhone(phoneNumber)) {
+    if (!validator.isMobilePhone(phoneNumber)) {
       return res.status(400).json({ message: 'Invalid phone number format' });
     }
 
-    if (isLeader !== undefined && !validator.isBoolean(isLeader.toString())) {
+    if (isLeader !== undefined && typeof isLeader !== 'boolean') {
       return res.status(400).json({ message: 'isLeader must be a boolean' });
     }
+
+    if (agreeToSMS !== undefined && typeof agreeToSMS !== 'boolean') {
+      return res.status(400).json({ message: 'agreeToSMS must be a boolean' });
+    }
+
+    const generator = new AvatarGenerator();
+    const avatarUrl = generator.generateRandomAvatar();
 
     try {
       const existingUser = await User.findOne({
         $or: [
-          { username: req.body.username },
-          { email: req.body.email }
+          { username },
+          { email }
         ]
       });
 
@@ -50,9 +61,16 @@ class AuthController {
         password: hashedPassword,
         isLeader,
         phoneNumber,
+        headShot: avatarUrl,
+        agreeToSMS
       });
 
       await user.save();
+
+      const sms = new SMSService();
+      const message = `Welcome to the team, ${firstName}! Your username is ${username}`;
+      await sms.sendSMS(phoneNumber, message);
+
       res.status(201).json({ message: 'User registered successfully' });
     } catch (err) {
       console.error(err);
@@ -113,11 +131,11 @@ class AuthController {
     const { firstName, lastName, email, username, phoneNumber } = req.body;
     const userId = req.user._id;
 
-    if(!validator.isEmail(email)) {
+    if (!validator.isEmail(email)) {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
-    if(!validator.isMobilePhone(phoneNumber)) {
+    if (!validator.isMobilePhone(phoneNumber)) {
       return res.status(400).json({ message: 'Invalid phone number format' });
     }
 

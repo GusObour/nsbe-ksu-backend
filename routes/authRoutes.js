@@ -13,7 +13,7 @@ router.post(
     check('lastName').not().isEmpty().withMessage('Last name is required'),
     check('email').isEmail().withMessage('Invalid email format'),
     check('username').not().isEmpty().withMessage('Username is required'),
-    check('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
+    check('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
     check('isLeader').optional().isBoolean().withMessage('isLeader must be a boolean'),
   ],
   AuthController.register

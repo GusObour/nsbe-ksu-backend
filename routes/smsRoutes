@@ -1,0 +1,10 @@
+const express = require('express');
+const SMSService = require('../services/smsService');
+
+const router = express.Router();
+const smsService = new SMSService();
+
+// Webhook for incoming SMS
+router.post('/', (req, res) => smsService.handleIncomingSMS(req, res));
+
+module.exports = router;

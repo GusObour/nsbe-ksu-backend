@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   isLeader: { type: Boolean, default: false },
   phoneNumber: { type: String, required: false },
   headShot: { type: String, required: false },
+  agreeToSms: { type: Boolean, default: true },
 });
 
 module.exports = mongoose.model('User', userSchema);
