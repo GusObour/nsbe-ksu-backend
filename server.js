@@ -9,6 +9,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const agenda = require('./services/agenda');
 const SessionManager = require('./services/SessionManager');
 const smsRoutes = require('./routes/smsRoutes');
+const photoRoutes = require('./routes/photoRoutes');
 
 const app = express();
 
@@ -50,6 +51,7 @@ const initServer = async () => {
         app.use('/leadership', leadershipRoutes);
         app.use('/events', eventRoutes);
         app.use('/sms', smsRoutes);
+        app.use('/api', photoRoutes);
 
         // Agenda
         agenda.on('ready', () => {
