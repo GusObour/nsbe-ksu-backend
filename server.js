@@ -22,10 +22,26 @@ const initServer = async () => {
         sessionManager.initialize();
 
         // Middleware
+        const allowedOrigins = [
+            process.env.PRODUCTION_CLIENT_URL,
+            process.env.CLIENT_URL,
+            process.env.STAGGING_CLIENT_URL,
+            'http://localhost:3000'
+        ];
+
         app.use(cors({
-            origin: [process.env.PRODUCTION_CLIENT_URL,process.env.CLIENT_URL, process.env.STAGGING_CLIENT_URL,'http://localhost:3000'],
+            origin: (origin, callback) => {
+                // allow requests with no origin - like mobile apps or curl requests
+                if (!origin) return callback(null, true);
+                if (allowedOrigins.indexOf(origin) === -1) {
+                    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+                    return callback(new Error(msg), false);
+                }
+                return callback(null, true);
+            },
             credentials: true,
         }));
+
         app.use(express.json());
 
         // Routes
@@ -33,7 +49,7 @@ const initServer = async () => {
         app.use('/sponsors', sponsorRoutes);
         app.use('/leadership', leadershipRoutes);
         app.use('/events', eventRoutes);
-        app.use('/sms', smsRoutes); 
+        app.use('/sms', smsRoutes);
 
         // Agenda
         agenda.on('ready', () => {
