@@ -1,4 +1,5 @@
 const { google } = require('googleapis');
+const Photos = require('googlephotos');
 
 class GooglePhotosService {
   constructor() {
@@ -7,7 +8,8 @@ class GooglePhotosService {
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
     );
-    this.SCOPES = ['https://www.googleapis.com/auth/photoslibrary.readonly'];
+    this.SCOPES = [Photos.Scopes.READ_ONLY, Photos.Scopes.SHARING];
+    this.albumId = process.env.GOOGLE_PHOTOS_ALBUM_ID;
   }
 
   generateAuthUrl() {
@@ -27,15 +29,10 @@ class GooglePhotosService {
     this.oauth2Client.setCredentials(token);
   }
 
-  async listMediaItemsFromAlbum(albumId) {
-    const photos = google.photos({ version: 'v1', auth: this.oauth2Client });
-    const res = await photos.mediaItems.search({
-      requestBody: {
-        albumId,
-        pageSize: 50,
-      },
-    });
-    return res.data.mediaItems;
+  async listMediaItemsFromAlbum() {
+    const photos = new Photos(this.oauth2Client.credentials.access_token);
+    const response = await photos.mediaItems.search(this.albumId, 5);
+    return response.mediaItems;
   }
 }
 

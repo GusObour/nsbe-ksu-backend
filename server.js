@@ -51,7 +51,7 @@ const initServer = async () => {
         app.use('/leadership', leadershipRoutes);
         app.use('/events', eventRoutes);
         app.use('/sms', smsRoutes);
-        app.use('/api', photoRoutes);
+        app.use('/googleapi', photoRoutes);
 
         // Agenda
         agenda.on('ready', () => {

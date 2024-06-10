@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const SMSService = require('../services/smsService');
 const validator = require('validator');
 const { AvatarGenerator } = require('random-avatar-generator');
+const { validationResult } = require('express-validator');
 
 class LeadershipController {
   async getAll(req, res) {
